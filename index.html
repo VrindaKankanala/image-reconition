@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Look Recreation - Upload Image</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .card {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-upload {
+            background-color: #007bff;
+            color: white;
+        }
+        .product-images {
+            margin-top: 20px;
+        }
+        .product-images img {
+            max-width: 100px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 class="text-center">Look Recreation</h1>
+            <p class="text-center">Upload an image to find similar products</p>
+            <form id="upload-form" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Choose file...</label>
+                    <input type="file" class="form-control-file" id="file" name="file" required>
+                </div>
+                <button type="submit" class="btn btn-upload btn-block">Upload</button>
+            </form>
+            <div id="result" class="mt-4"></div>
+            <div id="product-images" class="product-images"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#upload-form').on('submit', function (event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '/',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        $('#result').html('<h3>Prediction Result:</h3><p>Predicted Class: ' + data.predicted_class + '</p>');
+                        var productImagesHtml = '<h3>Recommended Products:</h3>';
+                        data.product_images.forEach(function(imagePath) {
+                            productImagesHtml += '<img src="/products/' + imagePath + '" alt="Product Image">';
+                        });
+                        $('#product-images').html(productImagesHtml);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#result').html('<h3>Error:</h3><p>' + textStatus + '</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
